@@ -1,23 +1,45 @@
 document.addEventListener('DOMContentLoaded', function() {
     const squares = document.querySelectorAll('#board div');
-    let currentPlayer = 'X';  // Start with player X
-    let boardState = Array(9).fill(' ');  // Initial state of the board
+    const statusDiv = document.getElementById('status');
+    let currentPlayer = 'X';  
+    let boardState = Array(9).fill(' ');  
+
+    function checkWinner(player) {
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],  // Horizontal
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],  // Vertical
+            [0, 4, 8], [2, 4, 6]             // Diagonal
+        ];
+        
+        return winningCombinations.some(combination => 
+            combination.every(index => boardState[index] === player)
+        );
+    }
 
     squares.forEach((square, index) => {
         square.classList.add('square');
 
-        // Attach click event listener to each square
         square.addEventListener('click', function() {
-            // Check if the square is empty and if so, make the move
             if (boardState[index] === ' ') {
                 boardState[index] = currentPlayer;
+                square.textContent = currentPlayer;
+                square.classList.add(currentPlayer);
 
-                square.textContent = currentPlayer; // Set the text of the square to X or O
-                square.classList.add(currentPlayer); // Add the X or O class for styling
-
-                // Toggle the current player
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                if (checkWinner(currentPlayer)) {
+                    statusDiv.textContent = `Congratulations! ${currentPlayer} is the Winner!`;
+                    statusDiv.classList.add('you-won');
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                }
             }
+        });
+
+        square.addEventListener('mouseover', function() {
+            square.classList.add('hover');
+        });
+
+        square.addEventListener('mouseout', function() {
+            square.classList.remove('hover');
         });
     });
 });
